@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" type="text/css" href="{{
+      static_url("css/style.css")
+    }}">
+
+    <title>Hello, world!</title>
+  </head>
+
+  <body>
+    <div>
+      <p>
+        👋 Hi from
+        <span class="highlight" id="{{ dict['environment'] }}">{{
+          dict["environment"]
+        }}</span>
+        environment!
+      </p>
+      <p><span class="counter">Counter:</span> {{ dict["counter"] }}</p>
+    </div>
+    <div>
+      <button type="button" onClick="window.location.reload()">Reload</button>
+    </div>
+  </body>
+</html>

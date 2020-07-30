@@ -10,6 +10,6 @@ RUN pip3 install --no-cache-dir -r requirements.txt
 
 COPY . /app
 
-RUN export $(cat .env | xargs)
+RUN export $$(cat .env | xargs)
 
 EXPOSE 8000/tcp

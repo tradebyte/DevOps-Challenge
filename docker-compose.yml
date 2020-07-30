@@ -11,7 +11,7 @@ services:
       - ./hello.py:/app/hello.py
     environment:
       - ENVIRONMENT:PROD
-      - HOST:local
+      - HOST:localhost
       - PORT:8000
       - REDIS_HOST=localhost
       - REDIS_PORT=6379

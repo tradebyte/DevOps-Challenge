@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    ports:
+      - "8001:8000"
+    depends_on:
+      - redis
+    volumes:
+      - .:/app/hello.py
+    environment:
+      - ENVIRONMENT:PROD
+    networks:
+      - connect
+
+  redis:
+    image: "redis:alpine"
+    volumes:
+      - redis_data:/data
+    networks:
+      - connect
+
+volumes:
+  redis_data:
+
+networks:
+  connect:

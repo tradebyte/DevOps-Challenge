@@ -13,9 +13,9 @@ services:
       - ENVIRONMENT:PROD
       - HOST:localhost
       - PORT:8000
-      - REDIS_HOST=localhost
-      - REDIS_PORT=6379
-      - REDIS_DB=0
+      - REDIS_HOST:localhost
+      - REDIS_PORT:6379
+      - REDIS_DB:0
     networks:
       - connect
     command: python hello.py

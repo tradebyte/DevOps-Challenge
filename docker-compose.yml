@@ -10,10 +10,10 @@ services:
     volumes:
       - ./hello.py:/app/hello.py
     environment:
-      - ENVIRONMENT:PROD
-      - PORT:8000
-      - REDIS_PORT:6379
-      - REDIS_DB:0
+      - ENVIRONMENT=PROD
+      - PORT=8000
+      - REDIS_PORT=6379
+      - REDIS_DB=0
     networks:
       - connect
     command: python hello.py

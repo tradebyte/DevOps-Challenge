@@ -11,9 +11,14 @@ services:
       - ./hello.py:/app/hello.py
     environment:
       - ENVIRONMENT:PROD
+      - HOST:local
+      - PORT:8000
+      - REDIS_HOST=localhost
+      - REDIS_PORT=6379
+      - REDIS_DB=0
     networks:
       - connect
-    command: export $$(cat .env | xargs) && python hello.py
+    command: python hello.py
 
   redis:
     image: "redis:alpine"

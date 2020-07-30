@@ -13,7 +13,7 @@ services:
       - ENVIRONMENT:PROD
     networks:
       - connect
-    command: python hello.py
+    command: export $$(cat .env | xargs) && python hello.py
 
   redis:
     image: "redis:alpine"

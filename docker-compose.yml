@@ -10,7 +10,7 @@ services:
     volumes:
       - ./hello.py:/app/hello.py
     env_file:
-      - .env
+      - ./.env
     networks:
       - connect
     command: python hello.py

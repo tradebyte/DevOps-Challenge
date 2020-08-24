@@ -8,8 +8,6 @@ services:
       - .:/tradebyte-devops-app1
     depends_on:
       - redis
-    links:
-      - redis
     env_file:
       - .env
     network_mode: host  

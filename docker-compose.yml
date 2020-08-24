@@ -12,6 +12,7 @@ services:
       - redis
     env_file:
       - .env
+    network_mode: host  
     ports:
       - "8000:8000"
     expose:
@@ -20,9 +21,10 @@ services:
   redis:
     image: redis:latest
     command: redis-server --appendonly yes
-    - ports:
-        - '6379:6379'
-    - expose:
-        - '6379'
+    ports:
+        - "6379:6379"
+    expose:
+        - "6379"
+    network_mode: host  
     volumes:
         - ./data:/data

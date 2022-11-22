@@ -1,0 +1,17 @@
+name: ci
+
+on:
+    push:
+        branches: ["main"]
+        
+jobs:
+    build:
+        runs-on: ubuntu-latest
+        steps:
+            -
+                name: Install python dependencies
+                run: pip install -r requirements.txt
+              
+            -
+                name: Run Unit tests
+                run: python tests/tests.py

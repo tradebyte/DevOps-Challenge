@@ -1,11 +1,8 @@
-name: CI-CD
+name: Pull request pipeline
 
-on:
-    push:
-        branches: 
-            - main
-
-
+ 
+on: [ pull_request]
+        
 jobs:
     build:
         runs-on: ubuntu-latest
@@ -19,4 +16,3 @@ jobs:
             -
                 name: Run Unit tests
                 run: python ./tests/test.py
-

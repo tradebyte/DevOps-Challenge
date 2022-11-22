@@ -10,4 +10,4 @@ jobs:
         steps:
             -
                 name: Install python dependencies
-                uses: pip install -r requirements.txt
+                run: pip install -r requirements.txt

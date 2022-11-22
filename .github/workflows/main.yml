@@ -6,8 +6,8 @@ on:
         
 jobs:
     build:
-    runs-on: ubuntu-latest
-    steps:
-        -
-            name: Install python dependencies
-            uses: pip install -r requirements.txt
+        runs-on: ubuntu-latest
+        steps:
+            -
+                name: Install python dependencies
+                uses: pip install -r requirements.txt

@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name : python-app
+spec:
+  replicas: 3 
+  selector:
+    matchLabels:
+      app: python-app
+  template:
+    metadata:
+        labels:
+            app: python-app
+    spec:
+      containers:
+      - name: app
+        image: manish3097/python-app
+        ports:
+        - containerPort: 8000
+        envFrom:
+            - configMapRef:
+                    name: dev-env
+        
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: app
+spec:
+  selector:
+    app: python-app
+  ports:
+  - port: 8000
+    targetPort: 8000
+  type: NodePort
+ 

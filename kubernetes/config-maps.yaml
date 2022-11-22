@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: dev-env
+data:
+    ENVIRONMENT: PROD
+    HOST: localhost
+    PORT: "8000"
+    REDIS_HOST: "10.97.16.155"
+    REDIS_PORT: "6379"
+    REDIS_DB: "0"

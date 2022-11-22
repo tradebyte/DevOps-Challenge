@@ -7,7 +7,8 @@ jobs:
     build:
         runs-on: ubuntu-latest
         steps:
-            -   name: checkout source code.
+            -   
+                name: checkout source code.
                 uses: actions/checkout@v3
             -
                 name: Install python dependencies
@@ -16,3 +17,13 @@ jobs:
             -
                 name: Run Unit tests
                 run: python ./tests/test.py
+    docker-build:
+        runs-on: [self-hosted, linux]
+        needs: ['build']       
+        steps:
+            -   
+                name: checkout source code.
+                uses: actions/checkout@v3 
+            -   
+                name: Build docker image
+                run: sudo docker build . -t python-app

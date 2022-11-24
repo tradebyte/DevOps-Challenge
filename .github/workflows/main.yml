@@ -2,14 +2,14 @@ name: CI-CD
 
 on:
   push:
-    branches: ["master"]
+    branches: ["main"]
 
 
 jobs:
     Run-tests:
-        runs-on: ubuntu-latest
+        runs-on: [self-hosted, linux]
         steps:
-            -   name: checkout source code.
+            -   name: checkout source code
                 uses: actions/checkout@v3
             -
                 name: Install python dependencies
@@ -20,18 +20,20 @@ jobs:
                 run: python ./tests/test.py
     docker-build:
         runs-on: [self-hosted, linux]
-        needs: ['build']       
+        needs: ['Run-tests']       
         steps:
             -   
                 name: checkout source code.
                 uses: actions/checkout@v3 
-            -   
+            -
                 name: Build docker image
-                run: sudo docker build . -t python-app
-                            
-            -   name: Login to Docker Hub
-                uses: docker/login-action@v2
-                with:
-                  username: ${{ secrets.DOCKERHUB_USERNAME }}
-                  password: ${{ secrets.DOCKERHUB_TOKEN }}
+                run:  sh ./scripts/dockerBuild.sh
+    Deployment:
+        runs-on: [self-hosted, linux]
+        needs: ['Run-tests','docker-build']     
+        steps:  
+            -
+                name: deploy image
+                run:  sh ./scripts/deploy.sh
+
                   

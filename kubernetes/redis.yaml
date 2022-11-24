@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name : redis-service
 spec:
-  replicas: 3 
+  replicas: 1
   selector:
     matchLabels:
       app: redis
@@ -29,6 +29,5 @@ spec:
   ports:
   - port: 6379
     targetPort: 6379
-
   type: ClusterIP
  

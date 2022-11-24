@@ -1,4 +1,4 @@
-import redis
+import redis,base64
 from redis.exceptions import ConnectionError
 import tornado.ioloop
 import tornado.web
@@ -11,6 +11,7 @@ try:
         host=os.getenv("REDIS_HOST"),
         port=int(os.getenv("REDIS_PORT")),
         db=int(os.getenv("REDIS_DB")),
+        password=os.getenv("REDIS_PASSWORD").strip('\n')
     )
     r.set("counter", 0)
 except ConnectionError:

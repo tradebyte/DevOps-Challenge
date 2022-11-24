@@ -15,11 +15,24 @@ spec:
       containers:
       - name: app
         image: manish3097/python-app
+        env:
+            - name: REDIS_PASSWORD
+              valueFrom:
+                     secretKeyRef:
+                          name: redis
+                          key: REDIS_PASSWORD
+        resources:
+          requests:
+                memory: "64Mi"
+                cpu: "250m"
+          limits:
+                memory: "128Mi"
+                cpu: "500m"
         ports:
         - containerPort: 8000
         envFrom:
             - configMapRef:
-                    name: dev-env
+                    name: env
         
 ---
 apiVersion: v1
@@ -32,5 +45,6 @@ spec:
   ports:
   - port: 8000
     targetPort: 8000
+    nodePort: 30000
   type: NodePort
  

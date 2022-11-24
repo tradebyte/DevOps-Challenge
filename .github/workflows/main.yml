@@ -2,7 +2,7 @@ name: CI-CD
 
 on:
   push:
-    branches: ["main"]
+    branches: ["master"]
 
 
 jobs:
@@ -22,6 +22,11 @@ jobs:
         runs-on: [self-hosted, linux]
         needs: ['Run-tests']       
         steps:
+            -   name: Docker Login
+                uses: docker/login-action@v2.1.0
+                with:
+                 username: ${{ secrets.DOCKERHUB_USERNAME }}
+                 password: ${{ secrets.DOCKERHUB_PASSWORD }}
             -   
                 name: checkout source code.
                 uses: actions/checkout@v3 

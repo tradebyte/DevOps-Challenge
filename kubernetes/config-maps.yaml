@@ -3,7 +3,7 @@ kind: ConfigMap
 metadata:
   name: env
 data:
-    ENVIRONMENT: DEV
+    ENVIRONMENT: PROD
     HOST: localhost
     PORT: "8000"
     REDIS_HOST: "redis-14216.c52.us-east-1-4.ec2.cloud.redislabs.com"

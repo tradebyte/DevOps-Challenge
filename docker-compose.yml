@@ -1,0 +1,26 @@
+version: '3'
+services:
+  python_app:
+    environment:
+      - REDIS_DB=0
+      - REDIS_PORT=6379
+      - REDIS_HOST=redis
+      - ENVIRONMENT=DEV
+      - PORT=8000
+      - HOST=localhost
+      - PYTHONUNBUFFERED=1
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - 8000:8000
+    volumes:
+      - .:/app
+    depends_on:
+      - redis
+    
+
+  redis:
+    image: redis:latest
+    ports:
+      - 6379:6379

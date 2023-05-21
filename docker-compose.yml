@@ -1,6 +1,6 @@
 version: '3'
 services:
-  python_app:
+  python-app:
     environment:
       - REDIS_DB=0
       - REDIS_PORT=6379
@@ -12,6 +12,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+    image: ghcr.io/ujjwalkarn954/tradebyte-devops-challenge
     ports:
       - 8000:8000
     volumes:

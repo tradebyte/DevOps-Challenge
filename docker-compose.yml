@@ -17,7 +17,7 @@ services:
     depends_on:
       - redis
     command: python hello.py
-
+    image: johnsami/dockerized-app-build-app:latest
   redis:
     image: "redis:6.0-alpine"
     ports:

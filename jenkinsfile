@@ -3,14 +3,14 @@ pipeline {
     agent any
 
    environment {
-        DOCKER_HUB_CREDENTIALS = credentials('dockerHub-token')
+        DOCKER_HUB_CREDENTIALS = credentials('docker-Hub-credentials')
     }
 
 
     stages {
         stage('Checkout') {
             steps {
-                git url: 'https://github.com/johnsamey/DEPI-Project.git', branch: 'master', credentialsId: 'github-token'
+                git url: 'https://github.com/johnsamey/DEPI-Project.git', branch: 'master', credentialsId: 'github'
             }
         }
 

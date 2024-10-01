@@ -2,11 +2,9 @@
 pipeline {
     agent any
 
-    environment {
-        DOCKER_HUB_USERNAME = credentials('docker-hub-username')
-        DOCKER_HUB_PASSWORD = credentials('docker-hub-password')
+   environment {
+        DOCKER_HUB_CREDENTIALS = credentials('docker-Hub-credentials')
     }
-
 
 
     stages {
@@ -33,7 +31,7 @@ pipeline {
                 script {
                     sh '''
                     cd $WORKSPACE
-                    echo "$DOCKER_HUB_PASSWORD" | docker login -u "$DOCKER_HUB_USERNAME" --password-stdin
+                    echo "$DOCKER_HUB_CREDENTIALS_PSW" | docker login -u "$DOCKER_HUB_CREDENTIALS_USR" --password-stdin
                     docker-compose push
                     '''
                 }

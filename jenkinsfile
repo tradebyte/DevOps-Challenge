@@ -1,0 +1,78 @@
+pipeline {
+    agent any
+
+    // Options to configure the pipeline behavior
+    options {
+        // Delete the workspace before the build starts
+        skipDefaultCheckout true
+    }
+
+    // Triggers to start the pipeline
+    triggers {
+        // Trigger the pipeline on GitHub push events
+        githubPush()
+    }
+
+    // Environment variables and credentials
+    environment {
+        // Define Docker Hub credentials (replace with your actual credentials ID)
+        DOCKER_HUB_CREDENTIALS = credentials('docker-hub-credentials-id')
+    }
+
+    stages {
+        stage('Cleanup Workspace') {
+            steps {
+                // Delete the workspace to ensure a clean state
+                deleteDir()
+            }
+        }
+
+        stage('Checkout Code') {
+            steps {
+                // Checkout the repository from GitHub
+                git(
+                    branch: 'master',
+                    url: 'https://github.com/johnsamey/DEPI-Project.git',
+                    credentialsId: 'github-token-credentials-id' // Replace with your GitHub credentials ID
+                )
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                // Use Docker Compose to build the Docker image
+                sh '''
+                    docker-compose build
+                    docker tag depi-project-app:latest johnsami/depi-project-app:latest
+                '''
+            }
+        }
+
+        stage('Push Docker Image') {
+            steps {
+                // Log in to Docker Hub and push the Docker image
+                sh '''
+                    echo "$DOCKER_HUB_PASSWORD" | docker login -u "$DOCKER_HUB_USERNAME" --password-stdin
+                    docker-compose push
+                '''
+            }
+        }
+    }
+
+    // Environment variables with credentials binding
+    environment {
+        // Bind Docker Hub username and password from the credentials
+        DOCKER_HUB_USERNAME = "${DOCKER_HUB_CREDENTIALS_USR}"
+        DOCKER_HUB_PASSWORD = "${DOCKER_HUB_CREDENTIALS_PSW}"
+    }
+
+    // Post-build actions (optional)
+    post {
+        success {
+            echo 'Build and push completed successfully!'
+        }
+        failure {
+            echo 'Build or push failed.'
+        }
+    }
+}

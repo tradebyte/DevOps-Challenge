@@ -1,15 +1,18 @@
 
 pipeline {
     agent any
-    options {
-        deleteDir()
-    }
+
    environment {
         DOCKER_HUB_CREDENTIALS = credentials('docker-Hub-credentials')
     }
 
 
     stages {
+        stage('Cleanup') {
+            steps {
+                deleteDir()
+            }
+        }
         stage('Checkout') {
             steps {
                 git url: 'https://github.com/johnsamey/DEPI-Project.git', branch: 'master', credentialsId: 'github'

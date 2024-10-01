@@ -1,78 +1,56 @@
+
 pipeline {
     agent any
 
-    // Options to configure the pipeline behavior
-    options {
-        // Delete the workspace before the build starts
-        skipDefaultCheckout true
-    }
-
-    // Triggers to start the pipeline
-    triggers {
-        // Trigger the pipeline on GitHub push events
-        githubPush()
-    }
-
-    // Environment variables and credentials
     environment {
-        // Define Docker Hub credentials (replace with your actual credentials ID)
-        DOCKER_HUB_CREDENTIALS = credentials('docker-hub-credentials-id')
+        DOCKER_HUB_USERNAME = credentials('docker-hub-username')
+        DOCKER_HUB_PASSWORD = credentials('docker-hub-password')
+    }
+
+    options {
+        // Example to delete the workspace before the build starts, similar to the option in the freestyle job.
+        deleteDir()
     }
 
     stages {
-        stage('Cleanup Workspace') {
+        stage('Checkout') {
             steps {
-                // Delete the workspace to ensure a clean state
-                deleteDir()
-            }
-        }
-
-        stage('Checkout Code') {
-            steps {
-                // Checkout the repository from GitHub
-                git(
-                    branch: 'master',
-                    url: 'https://github.com/johnsamey/DEPI-Project.git',
-                    credentialsId: 'github-token-credentials-id' // Replace with your GitHub credentials ID
-                )
+                git url: 'https://github.com/username/DEPiProject.git', branch: 'master', credentialsId: 'github-personal-access-token'
             }
         }
 
         stage('Build Docker Image') {
             steps {
-                // Use Docker Compose to build the Docker image
-                sh '''
+                script {
+                    sh '''
+                    cd $WORKSPACE
                     docker-compose build
-                    docker tag depi-project-app:latest johnsami/depi-project-app:latest
-                '''
+                    docker tag depi-project-app:latest joshman/depi-project-app:latest
+                    '''
+                }
             }
         }
 
-        stage('Push Docker Image') {
+        stage('Push to Docker Hub') {
             steps {
-                // Log in to Docker Hub and push the Docker image
-                sh '''
+                script {
+                    sh '''
+                    cd $WORKSPACE
                     echo "$DOCKER_HUB_PASSWORD" | docker login -u "$DOCKER_HUB_USERNAME" --password-stdin
                     docker-compose push
-                '''
+                    '''
+                }
             }
         }
     }
 
-    // Environment variables with credentials binding
-    environment {
-        // Bind Docker Hub username and password from the credentials
-        DOCKER_HUB_USERNAME = "${DOCKER_HUB_CREDENTIALS_USR}"
-        DOCKER_HUB_PASSWORD = "${DOCKER_HUB_CREDENTIALS_PSW}"
+    triggers {
+        pollSCM('H/5 * * * *')  // Poll SCM every 5 minutes (adjust as needed)
     }
 
-    // Post-build actions (optional)
     post {
-        success {
-            echo 'Build and push completed successfully!'
-        }
-        failure {
-            echo 'Build or push failed.'
+        always {
+            cleanWs()  // Clean workspace after the build
         }
     }
 }

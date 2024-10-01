@@ -7,10 +7,7 @@ pipeline {
         DOCKER_HUB_PASSWORD = credentials('docker-hub-password')
     }
 
-    options {
-        // Example to delete the workspace before the build starts, similar to the option in the freestyle job.
-        deleteDir()
-    }
+
 
     stages {
         stage('Checkout') {

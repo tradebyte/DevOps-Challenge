@@ -10,7 +10,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git url: 'https://github.com/username/DEPiProject.git', branch: 'master', credentialsId: 'github-personal-access-token'
+                git url: 'https://github.com/username/DEPiProject.git', branch: 'master', credentialsId: 'github-token'
             }
         }
 

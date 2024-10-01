@@ -1,7 +1,9 @@
 
 pipeline {
     agent any
-
+    options {
+        deleteDir()
+    }
    environment {
         DOCKER_HUB_CREDENTIALS = credentials('docker-Hub-credentials')
     }
@@ -77,9 +79,6 @@ pipeline {
                 to: 'mostafa77744333@gmail.com, johnhana567@gmail.com, khalid.salman1996@gmail.com, andrewadel3322@gmail.com',
                 attachLog: true
             )
-        }
-        always {
-            cleanWs()  // Clean workspace after the build
         }
     }
 }

@@ -20,6 +20,7 @@ pipeline {
                 git url: 'https://github.com/johnsamey/DEPI-Project.git', branch: 'master', credentialsId: 'github'
             }
         }
+
         stage('Run Tests') {
             steps {
                 script {
@@ -33,8 +34,8 @@ pipeline {
                     # Run tests in a Python Docker container
                     docker run --rm -v $WORKSPACE:/app -w /app python:3.9-slim bash -c "
                         pip install pytest &&
-                        if ls tests/test_*.py; then
-                            pytest tests/test_*.py --maxfail=1 --disable-warnings;
+                        if ls tests/test.py; then
+                            pytest tests/test.py --maxfail=1 --disable-warnings;
                         else
                             echo 'No tests found. Skipping.';
                         fi
@@ -43,7 +44,7 @@ pipeline {
                 }
             }
         }
-        
+
         stage('Prepare Docker Image') {
             steps {
                 script {

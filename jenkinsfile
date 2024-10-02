@@ -36,7 +36,7 @@ pipeline {
                 script {
                     sh '''
                     cd $WORKSPACE
-                    echo "$DOCKER_HUB_CREDENTIALS_PSW" | docker login -u "$DOCKER_HUB_CREDENTIALS_USR" --password-stdin
+                    echo "$DOCKER_CREDENTIALS_PSW" | docker login -u "$DOCKER_HUB_CREDENTIALS_USR" --password-stdin
                     docker-compose push
                     '''
                 }
@@ -45,31 +45,28 @@ pipeline {
     }
 
     triggers {
-        pollSCM('H/5 * * * *')  // Poll SCM every 5 minutes (adjust as needed)
+        pollSCM('H/5 * * * *') 
     }
     post {
-        always {
-            script {
-                emailext subject: "Jenkins Job: ${env.JOB_NAME} #${env.BUILD_NUMBER} - ${currentBuild.currentResult}",
-                         body: """
-                             Job Name: ${env.JOB_NAME}
-                             Build Number: ${env.BUILD_NUMBER}
-                             Build Status: ${currentBuild.currentResult}
-                             Build URL: ${env.BUILD_URL}
-                         """,
-                         recipientProviders: [[$class: 'DevelopersRecipientProvider'], [$class: 'RequesterRecipientProvider']],
-                         to: 'johnhana567@gmail.com'
-            }
-        }
-        success {
-            emailext subject: "SUCCESS: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
-                     body: "Good news, the build was successful!",
-                     to: 'johnhana567@gmail.com'
-        }
         failure {
-            emailext subject: "FAILURE: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
-                     body: "Unfortunately, the build has failed.",
-                     to: 'johnhana567@gmail.com'
+            emailext(
+                to: 'mostafa777444333@gmail.com, johnhnana567@gmail.com, khalid.salman1996@gmail.com',
+                subject: 'Build failed in Jenkins: ${JOB_NAME} - Build #${BUILD_NUMBER}',
+                body: """<p>Build failed in Jenkins:</p>
+                         <p>Job: ${JOB_NAME} - Build #${BUILD_NUMBER}</p>
+                         <p>Check console output at <a href="${BUILD_URL}">${BUILD_URL}</a></p>""",
+                attachLog: true
+            )
+        }
+        unstable {
+            emailext(
+                to: 'mostafa777444333@gmail.com, johnhnana567@gmail.com, khalid.salman1996@gmail.com',
+                subject: 'Build is unstable: ${JOB_NAME} - Build #${BUILD_NUMBER}',
+                body: """<p>Build is unstable:</p>
+                         <p>Job: ${JOB_NAME} - Build #${BUILD_NUMBER}</p>
+                         <p>Check console output at <a href="${BUILD_URL}">${BUILD_URL}</a></p>""",
+                attachLog: true
+            )
         }
     }
 }
@@ -110,3 +107,31 @@ pipeline {
 //             )
 //         }
 //     }
+
+
+
+    // post {
+    //     always {
+    //         script {
+    //             emailext subject: "Jenkins Job: ${env.JOB_NAME} #${env.BUILD_NUMBER} - ${currentBuild.currentResult}",
+    //                      body: """
+    //                          Job Name: ${env.JOB_NAME}
+    //                          Build Number: ${env.BUILD_NUMBER}
+    //                          Build Status: ${currentBuild.currentResult}
+    //                          Build URL: ${env.BUILD_URL}
+    //                      """,
+    //                      recipientProviders: [[$class: 'DevelopersRecipientProvider'], [$class: 'RequesterRecipientProvider']],
+    //                      to: 'johnhana567@gmail.com'
+    //         }
+    //     }
+    //     success {
+    //         emailext subject: "SUCCESS: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+    //                  body: "Good news, the build was successful!",
+    //                  to: 'johnhana567@gmail.com'
+    //     }
+    //     failure {
+    //         emailext subject: "FAILURE: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+    //                  body: "Unfortunately, the build has failed.",
+    //                  to: 'johnhana567@gmail.com'
+    //     }
+    // }

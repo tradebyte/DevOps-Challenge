@@ -92,6 +92,7 @@ pipeline {
         unstable {
             emailext(
                 to: 'mostafa77744333@gmail.com, johnhana567@gmail.com, khalid.salman1996@gmail.com, andrewadel3322@gmail.com',
+                subject: 'Build failed in Jenkins: ${JOB_NAME} - Build #${BUILD_NUMBER}',
                 body: """<p>Build is unstable:</p>
                          <p>Job: ${JOB_NAME} - Build #${BUILD_NUMBER}</p>
                          <p>Check console output at <a href="${BUILD_URL}">${BUILD_URL}</a></p>""",

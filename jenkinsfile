@@ -1,10 +1,5 @@
 pipeline {
-    agent {
-    docker {
-        image 'python:3.9-slim' // Use a Python Docker image
-        args '-u root' // Run as root to allow installations
-    }
-    }
+    agent any
 
     environment {
         DOCKER_HUB_CREDENTIALS = credentials('docker-Hub-credentials')
@@ -63,20 +58,21 @@ pipeline {
                 script {
                     sh '''
                     cd $WORKSPACE
-                    echo "Installing pytest..."
-                    pip install pytest
-                    
-                    echo "Running tests..."
-                    if [ -f tests/test.py ]; then
-                        pytest tests/test.py --maxfail=1 --disable-warnings
-                    else
-                        echo "No tests found. Skipping."
-                    fi
+                    echo "Running tests in Docker container..."
+
+                    # Run tests in a Python Docker container
+                    docker run --rm -v $WORKSPACE:/app -w /app python:3.9-slim bash -c "
+                        pip install pytest &&
+                        if [ -f tests/test.py ]; then
+                            pytest tests/test.py --maxfail=1 --disable-warnings;
+                        else
+                            echo 'No tests found. Skipping.';
+                        fi
+                    "
                     '''
                 }
             }
         }
-
         stage('Push to Docker-Hub') {
             steps {
                 script {

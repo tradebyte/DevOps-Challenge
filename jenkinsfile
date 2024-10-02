@@ -53,6 +53,25 @@ pipeline {
             }
         }
 
+        stage('Run Tests') {
+            steps {
+                script {
+                    sh '''
+                    cd $WORKSPACE
+                    echo "Installing pytest..."
+                    pip install pytest
+                    
+                    echo "Running tests..."
+                    if [ -f tests/test.py ]; then
+                        pytest tests/test.py --maxfail=1 --disable-warnings
+                    else
+                        echo "No tests found. Skipping."
+                    fi
+                    '''
+                }
+            }
+        }
+
         stage('Push to Docker-Hub') {
             steps {
                 script {

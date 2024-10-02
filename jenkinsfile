@@ -47,41 +47,66 @@ pipeline {
     triggers {
         pollSCM('H/5 * * * *')  // Poll SCM every 5 minutes (adjust as needed)
     }
-
     post {
-        failure {
-            emailext(
-                subject: 'Build failed: ${JOB_NAME} [${BUILD_NUMBER}]',
-                body: '''Build failed in Jenkins:
-                - Job: ${JOB_NAME}
-                - Build number: ${BUILD_NUMBER}
-                - Check console output at: ${BUILD_URL}''',
-                recipientProviders: [[$class: 'DevelopersRecipientProvider'], [$class: 'RequesterRecipientProvider']],
-                to: 'mostafa77744333@gmail.com, johnhana567@gmail.com, khalid.salman1996@gmail.com, andrewadel3322@gmail.com',
-                attachLog: true
-            )
-        }
-        unstable {
-            emailext(
-                subject: 'Build unstable: ${JOB_NAME} [${BUILD_NUMBER}]',
-                body: '''The build is unstable:
-                - Job: ${JOB_NAME}
-                - Build number: ${BUILD_NUMBER}
-                - Check console output at: ${BUILD_URL}''',
-                to: 'mostafa77744333@gmail.com, johnhana567@gmail.com, khalid.salman1996@gmail.com, andrewadel3322@gmail.com',
-                attachLog: true
-            )
+        always {
+            script {
+                emailext subject: "Jenkins Job: ${env.JOB_NAME} #${env.BUILD_NUMBER} - ${currentBuild.currentResult}",
+                         body: """
+                             Job Name: ${env.JOB_NAME}
+                             Build Number: ${env.BUILD_NUMBER}
+                             Build Status: ${currentBuild.currentResult}
+                             Build URL: ${env.BUILD_URL}
+                         """,
+                         recipientProviders: [[$class: 'DevelopersRecipientProvider'], [$class: 'RequesterRecipientProvider']],
+                         to: 'johnhana567@gmail.com'
+            }
         }
         success {
-            emailext(
-                subject: 'Build successful: ${JOB_NAME} [${BUILD_NUMBER}]',
-                body: '''The build was successful:
-                - Job: ${JOB_NAME}
-                - Build number: ${BUILD_NUMBER}
-                - Check console output at: ${BUILD_URL}''',
-                to: 'mostafa77744333@gmail.com, johnhana567@gmail.com, khalid.salman1996@gmail.com, andrewadel3322@gmail.com',
-                attachLog: true
-            )
+            emailext subject: "SUCCESS: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+                     body: "Good news, the build was successful!",
+                     to: 'johnhana567@gmail.com'
+        }
+        failure {
+            emailext subject: "FAILURE: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+                     body: "Unfortunately, the build has failed.",
+                     to: 'johnhana567@gmail.com'
         }
     }
 }
+
+// post {
+//         failure {
+//             emailext(
+//                 subject: 'Build failed: ${JOB_NAME} [${BUILD_NUMBER}]',
+//                 body: '''Build failed in Jenkins:
+//                 - Job: ${JOB_NAME}
+//                 - Build number: ${BUILD_NUMBER}
+//                 - Check console output at: ${BUILD_URL}''',
+//                 recipientProviders: [[$class: 'DevelopersRecipientProvider'], [$class: 'RequesterRecipientProvider']],
+//                 to: 'mostafa77744333@gmail.com, johnhana567@gmail.com, khalid.salman1996@gmail.com, andrewadel3322@gmail.com',
+//                 attachLog: true
+//             )
+//         }
+//         unstable {
+//             emailext(
+//                 subject: 'Build unstable: ${JOB_NAME} [${BUILD_NUMBER}]',
+//                 body: '''The build is unstable:
+//                 - Job: ${JOB_NAME}
+//                 - Build number: ${BUILD_NUMBER}
+//                 - Check console output at: ${BUILD_URL}''',
+//                 to: 'mostafa77744333@gmail.com, johnhana567@gmail.com, khalid.salman1996@gmail.com, andrewadel3322@gmail.com',
+//                 attachLog: true
+//             )
+//         }
+//         success {
+//             emailext(
+//                 subject: 'Build successful: ${JOB_NAME} [${BUILD_NUMBER}]',
+//                 body: '''The build was successful:
+//                 - Job: ${JOB_NAME}
+//                 - Build number: ${BUILD_NUMBER}
+//                 - Check console output at: ${BUILD_URL}''',
+//                 to: 'mostafa77744333@gmail.com, johnhana567@gmail.com, khalid.salman1996@gmail.com, andrewadel3322@gmail.com',
+//                 attachLog: true
+//             )
+//         }
+//     }

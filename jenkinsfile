@@ -5,6 +5,7 @@ pipeline {
         DOCKER_HUB_CREDENTIALS = credentials('docker-Hub-credentials')
         DOCKER_IMAGE_NAME = 'johnsami/dockerized-app-build-app'
         DOCKER_IMAGE_TAG = 'latest'
+        EMAIL_RECIPIENTS = 'mostafa77744333@gmail.com, johnhana567@gmail.com, khalid.salman1996@gmail.com, andrewadel3322@gmail.com'
     }
 
     stages {
@@ -69,50 +70,85 @@ pipeline {
         pollSCM('H/5 * * * *') // Poll GitHub every 5 minutes
     }
 
-    post {
-        always {
-            emailext(
-                to: 'mostafa77744333@gmail.com, johnhana567@gmail.com, khalid.salman1996@gmail.com, andrewadel3322@gmail.com',
-                subject: 'Test Email from Jenkins',
-                body: 'This is a test email to verify Jenkins email notifications.',
-                attachLog: false
-            )
+    // post {
+    //     always {
+    //         emailext(
+    //             to: 'mostafa77744333@gmail.com, johnhana567@gmail.com, khalid.salman1996@gmail.com, andrewadel3322@gmail.com',
+    //             subject: 'Test Email from Jenkins',
+    //             body: 'This is a test email to verify Jenkins email notifications.',
+    //             attachLog: false
+    //         )
 
-            mail to: 'mostafa77744333@gmail.com, johnhana567@gmail.com, khalid.salman1996@gmail.com, andrewadel3322@gmail.com',
-                subject: 'Test Email from Jenkins',
-                body: 'This is a test email to verify Jenkins email notifications.'
+    //         mail to: 'mostafa77744333@gmail.com, johnhana567@gmail.com, khalid.salman1996@gmail.com, andrewadel3322@gmail.com',
+    //             subject: 'Test Email from Jenkins',
+    //             body: 'This is a test email to verify Jenkins email notifications.'
+    //     }
+
+    //     failure {
+    //         emailext(
+    //             to: 'mostafa77744333@gmail.com, johnhana567@gmail.com, khalid.salman1996@gmail.com, andrewadel3322@gmail.com',
+    //             subject: 'Build failed in Jenkins: ${JOB_NAME} - Build #${BUILD_NUMBER}',
+    //             body: """<p>Build failed in Jenkins:</p>
+    //                      <p>Job: ${JOB_NAME} - Build #${BUILD_NUMBER}</p>
+    //                      <p>Check console output at <a href="${BUILD_URL}">${BUILD_URL}</a></p>""",
+    //             attachLog: true
+    //         )
+    //     }
+    //     unstable {
+    //         emailext(
+    //             to: 'mostafa77744333@gmail.com, johnhana567@gmail.com, khalid.salman1996@gmail.com, andrewadel3322@gmail.com',
+    //             subject: 'Build failed in Jenkins: ${JOB_NAME} - Build #${BUILD_NUMBER}',
+    //             body: """<p>Build is unstable:</p>
+    //                      <p>Job: ${JOB_NAME} - Build #${BUILD_NUMBER}</p>
+    //                      <p>Check console output at <a href="${BUILD_URL}">${BUILD_URL}</a></p>""",
+    //             attachLog: true
+    //         )
+    //     }
+    //     success {
+    //         emailext(
+    //             subject: 'Build successful: ${JOB_NAME} [${BUILD_NUMBER}]',
+    //             body: '''The build was successful:
+    //             - Job: ${JOB_NAME}
+    //             - Build number: ${BUILD_NUMBER}
+    //             - Check console output at: ${BUILD_URL}''',
+    //             to: 'mostafa77744333@gmail.com, johnhana567@gmail.com, khalid.salman1996@gmail.com, andrewadel3322@gmail.com',
+    //             attachLog: true
+    //         )
+    //     }
+    // }
+
+    post {
+        success {
+            mail to: "${EMAIL_RECIPIENTS}",
+                 subject: "✅ Build Successful: ${JOB_NAME} - Build #${BUILD_NUMBER}",
+                 body: """<p>Good news! The build was successful.</p>
+                          <p><strong>Job:</strong> ${JOB_NAME}</p>
+                          <p><strong>Build Number:</strong> ${BUILD_NUMBER}</p>
+                          <p>Check the details at <a href="${BUILD_URL}">${BUILD_URL}</a></p>""",
+                 mimeType: 'text/html',
+                 attachLog: true
         }
 
         failure {
-            emailext(
-                to: 'mostafa77744333@gmail.com, johnhana567@gmail.com, khalid.salman1996@gmail.com, andrewadel3322@gmail.com',
-                subject: 'Build failed in Jenkins: ${JOB_NAME} - Build #${BUILD_NUMBER}',
-                body: """<p>Build failed in Jenkins:</p>
-                         <p>Job: ${JOB_NAME} - Build #${BUILD_NUMBER}</p>
-                         <p>Check console output at <a href="${BUILD_URL}">${BUILD_URL}</a></p>""",
-                attachLog: true
-            )
+            mail to: "${EMAIL_RECIPIENTS}",
+                 subject: "❌ Build Failed: ${JOB_NAME} - Build #${BUILD_NUMBER}",
+                 body: """<p>Oops! The build has failed.</p>
+                          <p><strong>Job:</strong> ${JOB_NAME}</p>
+                          <p><strong>Build Number:</strong> ${BUILD_NUMBER}</p>
+                          <p>Check the console output at <a href="${BUILD_URL}">${BUILD_URL}</a></p>""",
+                 mimeType: 'text/html',
+                 attachLog: true
         }
+
         unstable {
-            emailext(
-                to: 'mostafa77744333@gmail.com, johnhana567@gmail.com, khalid.salman1996@gmail.com, andrewadel3322@gmail.com',
-                subject: 'Build failed in Jenkins: ${JOB_NAME} - Build #${BUILD_NUMBER}',
-                body: """<p>Build is unstable:</p>
-                         <p>Job: ${JOB_NAME} - Build #${BUILD_NUMBER}</p>
-                         <p>Check console output at <a href="${BUILD_URL}">${BUILD_URL}</a></p>""",
-                attachLog: true
-            )
-        }
-        success {
-            emailext(
-                subject: 'Build successful: ${JOB_NAME} [${BUILD_NUMBER}]',
-                body: '''The build was successful:
-                - Job: ${JOB_NAME}
-                - Build number: ${BUILD_NUMBER}
-                - Check console output at: ${BUILD_URL}''',
-                to: 'mostafa77744333@gmail.com, johnhana567@gmail.com, khalid.salman1996@gmail.com, andrewadel3322@gmail.com',
-                attachLog: true
-            )
+            mail to: "${EMAIL_RECIPIENTS}",
+                 subject: "⚠️ Build Unstable: ${JOB_NAME} - Build #${BUILD_NUMBER}",
+                 body: """<p>The build is unstable.</p>
+                          <p><strong>Job:</strong> ${JOB_NAME}</p>
+                          <p><strong>Build Number:</strong> ${BUILD_NUMBER}</p>
+                          <p>Check the console output at <a href="${BUILD_URL}">${BUILD_URL}</a></p>""",
+                 mimeType: 'text/html',
+                 attachLog: true
         }
     }
 

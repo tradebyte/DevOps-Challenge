@@ -125,7 +125,7 @@ pipeline {
                           <p><strong>Job:</strong> ${JOB_NAME}</p>
                           <p><strong>Build Number:</strong> ${BUILD_NUMBER}</p>
                           <p>Check the details at <a href="${BUILD_URL}">${BUILD_URL}</a></p>""",
-                 mimeType: 'text/html',
+                 mimeType: 'text/html'
                 //  attachLog: true
         }
 
@@ -136,7 +136,7 @@ pipeline {
                           <p><strong>Job:</strong> ${JOB_NAME}</p>
                           <p><strong>Build Number:</strong> ${BUILD_NUMBER}</p>
                           <p>Check the console output at <a href="${BUILD_URL}">${BUILD_URL}</a></p>""",
-                 mimeType: 'text/html',
+                 mimeType: 'text/html'
                 //  attachLog: true
         }
 
@@ -147,7 +147,7 @@ pipeline {
                           <p><strong>Job:</strong> ${JOB_NAME}</p>
                           <p><strong>Build Number:</strong> ${BUILD_NUMBER}</p>
                           <p>Check the console output at <a href="${BUILD_URL}">${BUILD_URL}</a></p>""",
-                 mimeType: 'text/html',
+                 mimeType: 'text/html'
                 //  attachLog: true
         }
     }

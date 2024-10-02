@@ -1,131 +1,119 @@
 pipeline {
-  agent any
+    agent any
 
-  environment {
-    DOCKER_HUB_CREDENTIALS = credentials('docker-Hub-credentials')
-    DOCKER_IMAGE_NAME = 'johnsami/dockerized-app-build-app'
-    DOCKER_IMAGE_TAG = 'latest'
-  }
-
-  stages {
-    stage('Cleanup') {
-      steps {
-        deleteDir()
-      }
+    environment {
+        DOCKER_HUB_CREDENTIALS = credentials('docker-Hub-credentials')
+        DOCKER_IMAGE_NAME = 'johnsami/dockerized-app-build-app'
+        DOCKER_IMAGE_TAG = 'latest'
     }
 
-    stage('Checkout') {
-      steps {
-        git url: 'https://github.com/johnsamey/DEPI-Project.git', branch: 'master', credentialsId: 'github'
-      }
-    }
-
-    // Optional Stage for Dependency Installation
-    stage('Install Dependencies (Optional)') {
-      when {
-        expression { // Add a condition to run this stage if needed (e.g., when you have external libraries)
-          return projectHasDependencies() // Replace with your logic to check for dependencies
+    stages {
+        stage('Cleanup') {
+            steps {
+                deleteDir()
+            }
         }
-      }
-      steps {
-        sh 'pip install -r requirements.txt' // Example for installing dependencies from a requirements file
-      }
-    }
 
-    stage('Prepare Docker Image (Optional)') {
-      steps {
-        script {
-          """
-          cd $WORKSPACE
-
-          # Check if the Docker image exists (Optional)
-          IMAGE_EXISTS=$(docker images -q $DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG)
-          if [ -n "$IMAGE_EXISTS" ]; then
-            echo "Docker image exists. Skipping build..."
-          else
-            echo "Docker image does not exist. Proceeding to build..."
-          fi
-          """
+        stage('Checkout') {
+            steps {
+                git url: 'https://github.com/johnsamey/DEPI-Project.git', branch: 'master', credentialsId: 'github'
+            }
         }
-      }
-    }
 
-    stage('Build Docker Image') {
-      steps {
-        script {
-          """
-          cd $WORKSPACE
-          docker-compose build
-          docker tag $DOCKER_IMAGE_NAME $DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG
-          """
+        stage('Prepare Docker Image') {
+            steps {
+                script {
+                    sh '''
+                    cd $WORKSPACE
+                    
+                    # Check if the Docker image exists
+                    IMAGE_EXISTS=$(docker images -q $DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG)
+                    
+                    if [ -n "$IMAGE_EXISTS" ]; then
+                        echo "Docker image exists. Deleting existing image..."
+                        docker rmi $DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG
+                    else
+                        echo "Docker image does not exist. Proceeding to build a new image..."
+                    fi
+                    '''
+                }
+            }
         }
-      }
-    }
 
-    stage('Run Unit Tests') {
-      steps {
-        // Assuming your tests are in DEPI-Project/tests
-        sh 'pytest DEPI-Project/tests --junitxml=junit-test-results.xml'  // Generate JUnit XML report
-      }
-    }
-
-    stage('Publish Test Results') {
-      steps {
-        // Assuming you have the JUnit Plugin installed
-        junit testResults: 'junit-test-results.xml'
-      }
-    }
-
-    stage('Push to Docker-Hub') {
-      steps {
-        script {
-          """
-          cd $WORKSPACE
-          echo "$DOCKER_HUB_CREDENTIALS_PSW" | docker login -u "$DOCKER_HUB_CREDENTIALS_USR" --password-stdin
-          docker-compose push
-          """
+        stage('Build Docker Image') {
+            steps {
+                script {
+                    sh '''
+                    cd $WORKSPACE
+                    docker-compose build
+                    docker tag $DOCKER_IMAGE_NAME $DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG
+                    '''
+                }
+            }
         }
-      }
-    }
-  }
 
-  triggers {
-    pollSCM('H/5 * * * *') // Poll GitHub every 5 minutes
-  }
+        stage('Push to Docker-Hub') {
+            steps {
+                script {
+                    sh '''
+                    cd $WORKSPACE
+                    echo "$DOCKER_HUB_CREDENTIALS_PSW" | docker login -u "$DOCKER_HUB_CREDENTIALS_USR" --password-stdin
+                    docker-compose push
+                    '''
+                }
+            }
+        }
+    }
 
-  post {
-    failure {
-      emailext(
-        to: 'mostafa777444333@gmail.com, johnhnana567@gmail.com, khalid.salman1996@gmail.com',
-        subject: 'Build failed in Jenkins: ${JOB_NAME} - Build #${BUILD_NUMBER}',
-        body: """<p>Build failed in Jenkins:</p>
-                   <p>Job: ${JOB_NAME} - Build #${BUILD_NUMBER}</p>
-                   <p>Check console output at <a href="${BUILD_URL}">${BUILD_URL}</a></p>""",
-        attachLog: true
-      )
+    triggers {
+        pollSCM('H/5 * * * *') // Poll GitHub every 5 minutes
     }
-    unstable {
-      emailext(
-        to: 'mostafa777444333@gmail.com, johnhnana567@gmail.com, khalid.salman1996@gmail.com',
-        subject: 'Build is unstable: ${JOB_NAME} - Build #${BUILD_NUMBER}',
-        body: """<p>Build is unstable:</p>
-                   <p>Job: ${JOB_NAME} - Build #${BUILD_NUMBER}</p>
-                   <p>Check console output at <a href="${BUILD_URL}">${BUILD_URL}</a></p>""",
-        attachLog: true
-      )
+
+    post {
+        always {
+            emailext(
+                to: 'mostafa77744333@gmail.com, johnhana567@gmail.com, khalid.salman1996@gmail.com, andrewadel3322@gmail.com',
+                subject: 'Test Email from Jenkins',
+                body: 'This is a test email to verify Jenkins email notifications.',
+                attachLog: false
+            )
+        }
+
+        failure {
+            emailext(
+                to: 'mostafa77744333@gmail.com, johnhana567@gmail.com, khalid.salman1996@gmail.com, andrewadel3322@gmail.com',
+                subject: 'Build failed in Jenkins: ${JOB_NAME} - Build #${BUILD_NUMBER}',
+                body: """<p>Build failed in Jenkins:</p>
+                         <p>Job: ${JOB_NAME} - Build #${BUILD_NUMBER}</p>
+                         <p>Check console output at <a href="${BUILD_URL}">${BUILD_URL}</a></p>""",
+                attachLog: true
+            )
+        }
+        unstable {
+            emailext(
+                to: 'mostafa77744333@gmail.com, johnhana567@gmail.com, khalid.salman1996@gmail.com, andrewadel3322@gmail.com',
+                subject: 'Build failed in Jenkins: ${JOB_NAME} - Build #${BUILD_NUMBER}',
+                body: """<p>Build is unstable:</p>
+                         <p>Job: ${JOB_NAME} - Build #${BUILD_NUMBER}</p>
+                         <p>Check console output at <a href="${BUILD_URL}">${BUILD_URL}</a></p>""",
+                attachLog: true
+            )
+        }
+        success {
+            emailext(
+                subject: 'Build successful: ${JOB_NAME} [${BUILD_NUMBER}]',
+                body: '''The build was successful:
+                - Job: ${JOB_NAME}
+                - Build number: ${BUILD_NUMBER}
+                - Check console output at: ${BUILD_URL}''',
+                to: 'mostafa77744333@gmail.com, johnhana567@gmail.com, khalid.salman1996@gmail.com, andrewadel3322@gmail.com',
+                attachLog: true
+            )
+        }
     }
-    success {
-      emailext(
-        subject: 'Build successful: ${JOB_NAME} [${BUILD_NUMBER}]',
-        body: '''The build was successful:
-                   - Job: ${JOB_NAME}
-                   - Build number: ${BUILD_NUMBER}
-                   - Check console output at: ${BUILD_URL}''',
-        to: 'mostafa777444333@gmail.com, johnhana567@gmail.com, khalid.salman1996@gmail.com, andrewadel3322@gmail.com',
-        attachLog: true
-      )
-    }
-  }
+
+
+
 }
 
 

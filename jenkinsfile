@@ -25,7 +25,7 @@ pipeline {
                     sh '''
                     cd $WORKSPACE
                     docker-compose build
-                    docker tag depi-project-app:latest johnsami/dockerized-app-build-app:latest
+                    docker tag dockerized-app-build-app johnsami/dockerized-app-build-app:latest
                     '''
                 }
             }

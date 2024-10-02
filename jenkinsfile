@@ -90,6 +90,17 @@ pipeline {
                 attachLog: true
             )
         }
+        success {
+            emailext(
+                subject: 'Build successful: ${JOB_NAME} [${BUILD_NUMBER}]',
+                body: '''The build was successful:
+                - Job: ${JOB_NAME}
+                - Build number: ${BUILD_NUMBER}
+                - Check console output at: ${BUILD_URL}''',
+                to: 'mostafa77744333@gmail.com, johnhana567@gmail.com, khalid.salman1996@gmail.com, andrewadel3322@gmail.com',
+                attachLog: true
+            )
+        }
     }
 }
 

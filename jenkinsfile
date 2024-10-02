@@ -126,7 +126,7 @@ pipeline {
                           <p><strong>Build Number:</strong> ${BUILD_NUMBER}</p>
                           <p>Check the details at <a href="${BUILD_URL}">${BUILD_URL}</a></p>""",
                  mimeType: 'text/html',
-                 attachLog: true
+                //  attachLog: true
         }
 
         failure {
@@ -137,7 +137,7 @@ pipeline {
                           <p><strong>Build Number:</strong> ${BUILD_NUMBER}</p>
                           <p>Check the console output at <a href="${BUILD_URL}">${BUILD_URL}</a></p>""",
                  mimeType: 'text/html',
-                 attachLog: true
+                //  attachLog: true
         }
 
         unstable {
@@ -148,7 +148,7 @@ pipeline {
                           <p><strong>Build Number:</strong> ${BUILD_NUMBER}</p>
                           <p>Check the console output at <a href="${BUILD_URL}">${BUILD_URL}</a></p>""",
                  mimeType: 'text/html',
-                 attachLog: true
+                //  attachLog: true
         }
     }
 

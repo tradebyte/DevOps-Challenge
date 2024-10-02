@@ -78,7 +78,7 @@ pipeline {
                 attachLog: false
             )
 
-            mail to: 'mostafa777444333@gmail.com',
+            mail to: 'mostafa77744333@gmail.com, johnhana567@gmail.com, khalid.salman1996@gmail.com, andrewadel3322@gmail.com',
                 subject: 'Test Email from Jenkins',
                 body: 'This is a test email to verify Jenkins email notifications.'
         }

@@ -63,8 +63,8 @@ pipeline {
                     # Run tests in a Python Docker container
                     docker run --rm -v $WORKSPACE:/app -w /app python:3.9-slim bash -c "
                         pip install pytest &&
-                        if [ -f tests/test.py ]; then
-                            pytest tests/test.py --maxfail=1 --disable-warnings;
+                        if [ -f ./tests/test.py ]; then
+                            pytest ./tests/test.py --maxfail=1 --disable-warnings;
                         else
                             echo 'No tests found. Skipping.';
                         fi

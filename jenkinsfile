@@ -78,6 +78,12 @@ pipeline {
                 attachLog: false
             )
         }
+        
+        always {
+            mail to: 'mostafa777444333@gmail.com',
+                subject: 'Test Email from Jenkins',
+                body: 'This is a test email to verify Jenkins email notifications.'
+        }
 
         failure {
             emailext(

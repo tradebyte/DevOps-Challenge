@@ -5,7 +5,7 @@ pipeline {
         DOCKER_HUB_CREDENTIALS = credentials('docker-Hub-credentials')
         DOCKER_IMAGE_NAME = 'johnsami/dockerized-app-build-app'
         DOCKER_IMAGE_TAG = 'latest'
-        EMAIL_RECIPIENTS = 'mostafa77744333@gmail.com, johnhana567@gmail.com, khalid.salman1996@gmail.com, andrewadel3322@gmail.com'
+        EMAIL_RECIPIENTS = 'johnhana567@gmail.com, khalid.salman1996@gmail.com, andrewadel3322@gmail.com'
     }
 
     stages {

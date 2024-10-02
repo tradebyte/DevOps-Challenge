@@ -1,5 +1,11 @@
 pipeline {
-    agent any
+    agent {
+    docker {
+        image 'python:3.9-slim' // Use a Python Docker image
+        args '-u root' // Run as root to allow installations
+    }
+}
+
 
     environment {
         DOCKER_HUB_CREDENTIALS = credentials('docker-Hub-credentials')

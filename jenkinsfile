@@ -1,11 +1,11 @@
-
 pipeline {
     agent any
 
-   environment {
+    environment {
         DOCKER_HUB_CREDENTIALS = credentials('docker-Hub-credentials')
+        DOCKER_IMAGE_NAME = 'johnsami/dockerized-app-build-app'
+        DOCKER_IMAGE_TAG = 'latest'
     }
-
 
     stages {
         stage('Cleanup') {
@@ -13,9 +13,30 @@ pipeline {
                 deleteDir()
             }
         }
+
         stage('Checkout') {
             steps {
                 git url: 'https://github.com/johnsamey/DEPI-Project.git', branch: 'master', credentialsId: 'github'
+            }
+        }
+
+        stage('Prepare Docker Image') {
+            steps {
+                script {
+                    sh '''
+                    cd $WORKSPACE
+                    
+                    # Check if the Docker image exists
+                    IMAGE_EXISTS=$(docker images -q $DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG)
+                    
+                    if [ -n "$IMAGE_EXISTS" ]; then
+                        echo "Docker image exists. Deleting existing image..."
+                        docker rmi $DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG
+                    else
+                        echo "Docker image does not exist. Proceeding to build a new image..."
+                    fi
+                    '''
+                }
             }
         }
 
@@ -25,7 +46,7 @@ pipeline {
                     sh '''
                     cd $WORKSPACE
                     docker-compose build
-                    docker tag johnsami/dockerized-app-build-app johnsami/dockerized-app-build-app:latest
+                    docker tag $DOCKER_IMAGE_NAME $DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG
                     '''
                 }
             }
@@ -45,8 +66,9 @@ pipeline {
     }
 
     triggers {
-        pollSCM('H/5 * * * *') 
+        pollSCM('H/5 * * * *') // Poll GitHub every 5 minutes
     }
+
     post {
         failure {
             emailext(
@@ -70,6 +92,7 @@ pipeline {
         }
     }
 }
+
 
 // post {
 //         failure {

@@ -94,7 +94,41 @@ pipeline {
     triggers {
         pollSCM('H/5 * * * *') // Poll GitHub every 5 minutes
     }
+    post {
+        // success {
+        //     mail to: "${EMAIL_RECIPIENTS}",
+        //          subject: "✅ Build Successful: ${JOB_NAME} - Build #${BUILD_NUMBER}",
+        //          body: """<p>Good news! The build was successful.</p>
+        //                   <p><strong>Job:</strong> ${JOB_NAME}</p>
+        //                   <p><strong>Build Number:</strong> ${BUILD_NUMBER}</p>
+        //                   <p>Check the details at <a href="${BUILD_URL}">${BUILD_URL}</a></p>""",
+        //          mimeType: 'text/html'
+        //         //  attachLog: true
+        // }
 
+        failure {
+            mail to: "${EMAIL_RECIPIENTS}",
+                 subject: "❌ Build Failed: ${JOB_NAME} - Build #${BUILD_NUMBER}",
+                 body: """<p>Oops! The build has failed.</p>
+                          <p><strong>Job:</strong> ${JOB_NAME}</p>
+                          <p><strong>Build Number:</strong> ${BUILD_NUMBER}</p>
+                          <p>Check the console output at <a href="${BUILD_URL}">${BUILD_URL}</a></p>""",
+                 mimeType: 'text/html'
+                //  attachLog: true
+        }
+
+        unstable {
+            mail to: "${EMAIL_RECIPIENTS}",
+                 subject: "⚠️ Build Unstable: ${JOB_NAME} - Build #${BUILD_NUMBER}",
+                 body: """<p>The build is unstable.</p>
+                          <p><strong>Job:</strong> ${JOB_NAME}</p>
+                          <p><strong>Build Number:</strong> ${BUILD_NUMBER}</p>
+                          <p>Check the console output at <a href="${BUILD_URL}">${BUILD_URL}</a></p>""",
+                 mimeType: 'text/html'
+                //  attachLog: true
+        }
+    }
+}
     // post {
     //     always {
     //         emailext(
@@ -141,45 +175,6 @@ pipeline {
     //         )
     //     }
     // }
-
-    post {
-        success {
-            mail to: "${EMAIL_RECIPIENTS}",
-                 subject: "✅ Build Successful: ${JOB_NAME} - Build #${BUILD_NUMBER}",
-                 body: """<p>Good news! The build was successful.</p>
-                          <p><strong>Job:</strong> ${JOB_NAME}</p>
-                          <p><strong>Build Number:</strong> ${BUILD_NUMBER}</p>
-                          <p>Check the details at <a href="${BUILD_URL}">${BUILD_URL}</a></p>""",
-                 mimeType: 'text/html'
-                //  attachLog: true
-        }
-
-        failure {
-            mail to: "${EMAIL_RECIPIENTS}",
-                 subject: "❌ Build Failed: ${JOB_NAME} - Build #${BUILD_NUMBER}",
-                 body: """<p>Oops! The build has failed.</p>
-                          <p><strong>Job:</strong> ${JOB_NAME}</p>
-                          <p><strong>Build Number:</strong> ${BUILD_NUMBER}</p>
-                          <p>Check the console output at <a href="${BUILD_URL}">${BUILD_URL}</a></p>""",
-                 mimeType: 'text/html'
-                //  attachLog: true
-        }
-
-        unstable {
-            mail to: "${EMAIL_RECIPIENTS}",
-                 subject: "⚠️ Build Unstable: ${JOB_NAME} - Build #${BUILD_NUMBER}",
-                 body: """<p>The build is unstable.</p>
-                          <p><strong>Job:</strong> ${JOB_NAME}</p>
-                          <p><strong>Build Number:</strong> ${BUILD_NUMBER}</p>
-                          <p>Check the console output at <a href="${BUILD_URL}">${BUILD_URL}</a></p>""",
-                 mimeType: 'text/html'
-                //  attachLog: true
-        }
-    }
-
-
-
-}
 
 
 // post {

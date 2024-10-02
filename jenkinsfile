@@ -20,7 +20,30 @@ pipeline {
                 git url: 'https://github.com/johnsamey/DEPI-Project.git', branch: 'master', credentialsId: 'github'
             }
         }
+        stage('Run Tests') {
+            steps {
+                script {
+                    sh '''
+                    cd $WORKSPACE
+                    echo "Current directory: $(pwd)"
+                    echo "Listing files in the tests directory:"
+                    ls -la tests/
+                    echo "Running tests in Docker container..."
 
+                    # Run tests in a Python Docker container
+                    docker run --rm -v $WORKSPACE:/app -w /app python:3.9-slim bash -c "
+                        pip install pytest &&
+                        if ls tests/test_*.py; then
+                            pytest tests/test_*.py --maxfail=1 --disable-warnings;
+                        else
+                            echo 'No tests found. Skipping.';
+                        fi
+                    "
+                    '''
+                }
+            }
+        }
+        
         stage('Prepare Docker Image') {
             steps {
                 script {
@@ -53,31 +76,7 @@ pipeline {
             }
         }
 
-        stage('Run Tests') {
-            steps {
-                script {
-                    sh '''
-                    cd $WORKSPACE
-                    echo "Current directory: $(pwd)"
-                    echo "Listing files in the tests directory:"
-                    ls -la tests/
-                    echo "Running tests in Docker container..."
-
-                    # Run tests in a Python Docker container
-                    docker run --rm -v $WORKSPACE:/app -w /app python:3.9-slim bash -c "
-                        pip install pytest &&
-                        if ls tests/test_*.py; then
-                            pytest tests/test_*.py --maxfail=1 --disable-warnings;
-                        else
-                            echo 'No tests found. Skipping.';
-                        fi
-                    "
-                    '''
-                }
-            }
-        }
-
-
+        
         stage('Push to Docker-Hub') {
             steps {
                 script {

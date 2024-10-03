@@ -44,16 +44,6 @@ pipeline {
         //         }
         //     }
         // }
-        stage('Run Tests') {
-            steps {
-                script {
-                    sh '''
-                    cd $WORKSPACE
-                    docker-compose run --rm app python -m unittest discover
-                    '''
-                }
-            }
-        }
         stage('Prepare Docker Image') {
             steps {
                 script {

@@ -72,9 +72,9 @@ pipeline {
         }
     }
 
-    triggers {
-        pollSCM('H/5 * * * *') // Poll GitHub every 5 minutes
-    }
+    // triggers {
+    //     pollSCM('H/5 * * * *') // Poll GitHub every 5 minutes
+    // }
     post {
         // success {
         //     mail to: "${EMAIL_RECIPIENTS}",

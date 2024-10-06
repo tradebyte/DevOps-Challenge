@@ -21,29 +21,6 @@ pipeline {
             }
         }
 
-        // stage('Run Tests') {
-        //     steps {
-        //         script {
-        //             sh '''
-        //             cd $WORKSPACE
-        //             echo "Current directory: $(pwd)"
-        //             echo "Listing files in the tests directory:"
-        //             ls -la tests/
-        //             echo "Running tests in Docker container..."
-
-        //             # Run tests in a Python Docker container
-        //             docker run --rm -v $WORKSPACE:/app -w /app python:3.9-slim bash -c "
-        //                 pip install pytest &&
-        //                 if ls tests/test.py; then
-        //                     pytest tests/test.py --maxfail=1 --disable-warnings;
-        //                 else
-        //                     echo 'No tests found. Skipping.';
-        //                 fi
-        //             "
-        //             '''
-        //         }
-        //     }
-        // }
         stage('Prepare Docker Image') {
             steps {
                 script {
@@ -76,7 +53,15 @@ pipeline {
             }
         }
 
-        
+        stage('Run Tests') {
+            steps {
+                sh 'echo "Running tests..."'
+                sh 'cd counting_App && docker-compose up -d --build my_app '
+                sh 'cd counting_App && docker exec my_app_container python -m unittest test_hello.py'
+                sh 'cd counting_App && docker-compose down'
+            }
+        }
+
         stage('Push to Docker-Hub') {
             steps {
                 script {

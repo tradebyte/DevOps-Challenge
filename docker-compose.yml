@@ -13,12 +13,14 @@ services:
       - REDIS_PORT=6379
       - REDIS_DB=0
     ports:
-      - "8010:8000"
+      - "8000:8000"
     depends_on:
       - redis
     command: python hello.py
+    container_name: app-container
     image: johnsami/dockerized-app-build-app:latest
   redis:
     image: "redis:6.0-alpine"
     ports:
       - "6379:6379"
+    container_name: redis-container

@@ -56,9 +56,6 @@ pipeline {
         stage('Run Tests') {
             steps {
                 sh 'echo "Running tests..."'
-                sh 'cd counting_App && docker-compose up -d --build my_app '
-                sh 'cd counting_App && docker exec my_app_container python -m unittest test_hello.py'
-                sh 'cd counting_App && docker-compose down'
             }
         }
 

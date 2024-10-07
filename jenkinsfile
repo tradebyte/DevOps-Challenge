@@ -1,0 +1,224 @@
+pipeline {
+    agent any
+
+    environment {
+        DOCKER_HUB_CREDENTIALS = credentials('docker-Hub-credentials')
+        DOCKER_IMAGE_NAME = 'johnsami/dockerized-app-build-app'
+        DOCKER_IMAGE_TAG = 'latest'
+        EMAIL_RECIPIENTS = 'johnhana567@gmail.com, khalid.salman1996@gmail.com, andrewadel3322@gmail.com'
+    }
+
+    stages {
+        stage('Cleanup') {
+            steps {
+                deleteDir()
+            }
+        }
+
+        stage('Checkout') {
+            steps {
+                git url: 'https://github.com/johnsamey/DEPI-Project.git', branch: 'master', credentialsId: 'github'
+            }
+        }
+
+        stage('Prepare Docker Image') {
+            steps {
+                script {
+                    sh '''
+                    cd $WORKSPACE
+                    
+                    # Check if the Docker image exists
+                    IMAGE_EXISTS=$(docker images -q $DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG)
+                    
+                    if [ -n "$IMAGE_EXISTS" ]; then
+                        echo "Docker image exists. Deleting existing image..."
+                        docker rmi $DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG
+                    else
+                        echo "Docker image does not exist. Proceeding to build a new image..."
+                    fi
+                    '''
+                }
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                script {
+                    sh '''
+                    cd $WORKSPACE
+                    docker-compose build
+                    docker tag $DOCKER_IMAGE_NAME $DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG
+                    '''
+                }
+            }
+        }
+
+        stage('Run Tests') {
+            steps {
+                sh 'echo "Running tests..."'
+            }
+        }
+
+        stage('Push to Docker-Hub') {
+            steps {
+                script {
+                    sh '''
+                    cd $WORKSPACE
+                    echo "$DOCKER_HUB_CREDENTIALS_PSW" | docker login -u "$DOCKER_HUB_CREDENTIALS_USR" --password-stdin
+                    docker-compose push
+                    '''
+                }
+            }
+        }
+    }
+
+    // triggers {
+    //     pollSCM('H/5 * * * *') // Poll GitHub every 5 minutes
+    // }
+    post {
+        // success {
+        //     mail to: "${EMAIL_RECIPIENTS}",
+        //          subject: "✅ Build Successful: ${JOB_NAME} - Build #${BUILD_NUMBER}",
+        //          body: """<p>Good news! The build was successful.</p>
+        //                   <p><strong>Job:</strong> ${JOB_NAME}</p>
+        //                   <p><strong>Build Number:</strong> ${BUILD_NUMBER}</p>
+        //                   <p>Check the details at <a href="${BUILD_URL}">${BUILD_URL}</a></p>""",
+        //          mimeType: 'text/html'
+        //         //  attachLog: true
+        // }
+
+        failure {
+            mail to: "${EMAIL_RECIPIENTS}",
+                 subject: "❌ Build Failed: ${JOB_NAME} - Build #${BUILD_NUMBER}",
+                 body: """<p>Oops! The build has failed.</p>
+                          <p><strong>Job:</strong> ${JOB_NAME}</p>
+                          <p><strong>Build Number:</strong> ${BUILD_NUMBER}</p>
+                          <p>Check the console output at <a href="${BUILD_URL}">${BUILD_URL}</a></p>""",
+                 mimeType: 'text/html'
+                //  attachLog: true
+        }
+
+        unstable {
+            mail to: "${EMAIL_RECIPIENTS}",
+                 subject: "⚠️ Build Unstable: ${JOB_NAME} - Build #${BUILD_NUMBER}",
+                 body: """<p>The build is unstable.</p>
+                          <p><strong>Job:</strong> ${JOB_NAME}</p>
+                          <p><strong>Build Number:</strong> ${BUILD_NUMBER}</p>
+                          <p>Check the console output at <a href="${BUILD_URL}">${BUILD_URL}</a></p>""",
+                 mimeType: 'text/html'
+                //  attachLog: true
+        }
+    }
+}
+    // post {
+    //     always {
+    //         emailext(
+    //             to: 'mostafa77744333@gmail.com, johnhana567@gmail.com, khalid.salman1996@gmail.com, andrewadel3322@gmail.com',
+    //             subject: 'Test Email from Jenkins',
+    //             body: 'This is a test email to verify Jenkins email notifications.',
+    //             attachLog: false
+    //         )
+
+    //         mail to: 'mostafa77744333@gmail.com, johnhana567@gmail.com, khalid.salman1996@gmail.com, andrewadel3322@gmail.com',
+    //             subject: 'Test Email from Jenkins',
+    //             body: 'This is a test email to verify Jenkins email notifications.'
+    //     }
+
+    //     failure {
+    //         emailext(
+    //             to: 'mostafa77744333@gmail.com, johnhana567@gmail.com, khalid.salman1996@gmail.com, andrewadel3322@gmail.com',
+    //             subject: 'Build failed in Jenkins: ${JOB_NAME} - Build #${BUILD_NUMBER}',
+    //             body: """<p>Build failed in Jenkins:</p>
+    //                      <p>Job: ${JOB_NAME} - Build #${BUILD_NUMBER}</p>
+    //                      <p>Check console output at <a href="${BUILD_URL}">${BUILD_URL}</a></p>""",
+    //             attachLog: true
+    //         )
+    //     }
+    //     unstable {
+    //         emailext(
+    //             to: 'mostafa77744333@gmail.com, johnhana567@gmail.com, khalid.salman1996@gmail.com, andrewadel3322@gmail.com',
+    //             subject: 'Build failed in Jenkins: ${JOB_NAME} - Build #${BUILD_NUMBER}',
+    //             body: """<p>Build is unstable:</p>
+    //                      <p>Job: ${JOB_NAME} - Build #${BUILD_NUMBER}</p>
+    //                      <p>Check console output at <a href="${BUILD_URL}">${BUILD_URL}</a></p>""",
+    //             attachLog: true
+    //         )
+    //     }
+    //     success {
+    //         emailext(
+    //             subject: 'Build successful: ${JOB_NAME} [${BUILD_NUMBER}]',
+    //             body: '''The build was successful:
+    //             - Job: ${JOB_NAME}
+    //             - Build number: ${BUILD_NUMBER}
+    //             - Check console output at: ${BUILD_URL}''',
+    //             to: 'mostafa77744333@gmail.com, johnhana567@gmail.com, khalid.salman1996@gmail.com, andrewadel3322@gmail.com',
+    //             attachLog: true
+    //         )
+    //     }
+    // }
+
+
+// post {
+//         failure {
+//             emailext(
+//                 subject: 'Build failed: ${JOB_NAME} [${BUILD_NUMBER}]',
+//                 body: '''Build failed in Jenkins:
+//                 - Job: ${JOB_NAME}
+//                 - Build number: ${BUILD_NUMBER}
+//                 - Check console output at: ${BUILD_URL}''',
+//                 recipientProviders: [[$class: 'DevelopersRecipientProvider'], [$class: 'RequesterRecipientProvider']],
+//                 to: 'mostafa77744333@gmail.com, johnhana567@gmail.com, khalid.salman1996@gmail.com, andrewadel3322@gmail.com',
+//                 attachLog: true
+//             )
+//         }
+//         unstable {
+//             emailext(
+//                 subject: 'Build unstable: ${JOB_NAME} [${BUILD_NUMBER}]',
+//                 body: '''The build is unstable:
+//                 - Job: ${JOB_NAME}
+//                 - Build number: ${BUILD_NUMBER}
+//                 - Check console output at: ${BUILD_URL}''',
+//                 to: 'mostafa77744333@gmail.com, johnhana567@gmail.com, khalid.salman1996@gmail.com, andrewadel3322@gmail.com',
+//                 attachLog: true
+//             )
+//         }
+//         success {
+//             emailext(
+//                 subject: 'Build successful: ${JOB_NAME} [${BUILD_NUMBER}]',
+//                 body: '''The build was successful:
+//                 - Job: ${JOB_NAME}
+//                 - Build number: ${BUILD_NUMBER}
+//                 - Check console output at: ${BUILD_URL}''',
+//                 to: 'mostafa77744333@gmail.com, johnhana567@gmail.com, khalid.salman1996@gmail.com, andrewadel3322@gmail.com',
+//                 attachLog: true
+//             )
+//         }
+//     }
+
+
+
+    // post {
+    //     always {
+    //         script {
+    //             emailext subject: "Jenkins Job: ${env.JOB_NAME} #${env.BUILD_NUMBER} - ${currentBuild.currentResult}",
+    //                      body: """
+    //                          Job Name: ${env.JOB_NAME}
+    //                          Build Number: ${env.BUILD_NUMBER}
+    //                          Build Status: ${currentBuild.currentResult}
+    //                          Build URL: ${env.BUILD_URL}
+    //                      """,
+    //                      recipientProviders: [[$class: 'DevelopersRecipientProvider'], [$class: 'RequesterRecipientProvider']],
+    //                      to: 'johnhana567@gmail.com'
+    //         }
+    //     }
+    //     success {
+    //         emailext subject: "SUCCESS: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+    //                  body: "Good news, the build was successful!",
+    //                  to: 'johnhana567@gmail.com'
+    //     }
+    //     failure {
+    //         emailext subject: "FAILURE: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+    //                  body: "Unfortunately, the build has failed.",
+    //                  to: 'johnhana567@gmail.com'
+    //     }
+    // }

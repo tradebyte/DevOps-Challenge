@@ -6,20 +6,17 @@ You should fork/clone this repository to use as a basis for the challenge.
 
 ## The challenge
 
-Subject of this challenge is to setup a robust, production ready and developer friendly Continuous Deployment pipeline for the given demo application.
+Subject of this challenge is to setup a robust, production ready and scalable Kubernetes deployment for the given demo application.
 
-The demo application can be found in this repository and the server for the deployment will be provided by us for you to work with.
+The demo application can be found in this repository.
 
 The requirements are as follows:
 
-- Choose an appropriate CI/CD tool.
 - Use a container technology of your own choosing for the demo application.
-- Setup a continuous deployment pipeline for the containerized demo application with your chosen CI/CD tool.
-  - It should contain at least a testing and a deployment stage.
-  - It should only be deployed if the testing stage, which runs the demo applications tests, is successful.
-  - It should follow the [GitHub flow](https://guides.github.com/introduction/flow/) workflow for the deployment.
-  - It should be deployed to the provided demo server.
-- Setup a development environment which mirrors the production environment as closely as possible.
+- Setup a local Kubernetes cluster (e.g. [minikube](https://minikube.sigs.k8s.io/docs/)) for the containerized demo application as you would do it in production.
+  - It should have at least 3 replicas.
+  - It should automatically scale with CPU utilization.
+  - It should handle environment variables in a secure way.
 - Think about scalability and performance.
 
 ## Demo application
@@ -92,7 +89,7 @@ Thank you, [contributors]!
 
 ## License
 
-Copyright (c) 2019 by the Tradebyte Software GmbH.<br/>
+Copyright (c) 2024 by the Tradebyte Software GmbH.<br/>
 `DevOps-Challenge` is free software, and may be redistributed under the terms specified in the [LICENSE] file.
 
 [license]: /LICENSE

@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: demo-service
+spec:
+  selector:
+    app: demo-app
+  ports:
+    - protocol: TCP
+      port: 80           # Expose on port 80 within the cluster
+      targetPort: 8000    # Container port to which the traffic will be forwarded
+      nodePort: 30080     # External port on each node to access the application
+  type: NodePort
+  

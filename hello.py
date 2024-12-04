@@ -28,10 +28,21 @@ class MainHandler(tornado.web.RequestHandler):
             dict={"environment": environment, "counter": r.incr("counter", 1)},
         )
 
+class LiveHandler(tornado.web.RequestHandler):
+    def get(self):
+        response = {"status": "live"}
+        self.set_header("Content-Type", "application/json")
+        self.write(response)
+
+class ReadyHandler(tornado.web.RequestHandler):
+    def get(self):
+        response = {"status": "ready"}
+        self.set_header("Content-Type", "application/json")
+        self.write(response)
 
 class Application(tornado.web.Application):
     def __init__(self):
-        handlers = [(r"/", MainHandler)]
+        handlers = [(r"/", MainHandler), (r"/live", LiveHandler), (r"/ready", ReadyHandler)]
         settings = {
             "template_path": os.path.join(
                 os.path.dirname(os.path.abspath(__file__)), "templates"

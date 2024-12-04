@@ -1,0 +1,63 @@
+env: staging
+annotations:
+  "project": "Tradebyte Home Challenge"
+application:
+  image: cardiffc/tradebyte
+  imageTag: 4
+  port: 8000
+  appHost: tradebyte.test
+scaling:
+  dev:
+    minReplicas: 3
+    maxReplicas: 3
+  staging:
+    minReplicas: 3
+    maxReplicas: 6
+  prod:
+    minReplicas: 3
+    maxReplicas: 10
+  cpuTh: 80
+strategy:
+  type: RollingUpdate
+  maxSurge: 2
+  maxUnavailable: 2
+resources:
+  dev:
+    limits:
+      cpu: 200m
+      memory: 1Gi
+    requests:
+      cpu: 10m
+      memory: 500Mi
+  staging:
+    limits:
+      cpu: 200m
+      memory: 2Gi
+    requests:
+      cpu: 50m
+      memory: 1Gi
+  prod:
+    limits:
+      cpu: 1000m
+      memory: 8Gi
+    requests:
+      cpu: 100m
+      memory: 1Gi
+livenessProbe:
+  path: /live
+  initialDelaySeconds: 15
+  periodSeconds: 10
+  failureThreshold: 3
+readinessProbe:
+  path: /ready
+  initialDelaySeconds: 10
+  periodSeconds: 10
+  failureThreshold: 3
+redis:
+  replica:
+    replicaCount: 1
+  auth:
+    enabled: false
+
+
+

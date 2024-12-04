@@ -1,0 +1,101 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Chart.Name }}
+  labels:
+    app: {{ .Chart.Name }}
+  annotations:
+  {{- with .Values.annotations }}
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  replicas: {{ .Values.scaling.dev.minReplicas }}
+  strategy:
+    type: {{ .Values.strategy.type }}
+    {{- if eq .Values.strategy.type "RollingUpdate"}}
+    rollingUpdate:
+      maxSurge: {{ .Values.strategy.maxSurge }}
+      maxUnavailable: {{ .Values.strategy.maxUnavailable }}
+    {{- end }}
+  selector:
+    matchLabels:
+      app: {{ .Chart.Name }}
+  template:
+    metadata:
+      name: {{ .Chart.Name }}
+      annotations:
+      {{- with .Values.annotations }}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        app: {{ .Chart.Name }}
+    spec:
+      securityContext:
+        runAsUser: 1000
+        runAsGroup: 3000
+        fsGroup: 2000
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - podAffinityTerm:
+                topologyKey: kubernetes.io/hostname
+                labelSelector:
+                  matchLabels:
+                    app: {{ .Chart.Name }}
+              weight: 100
+      {{- if .Values.imagePullSecrets }}
+      imagePullSecrets:
+        - name: {{ .Values.imagePullSecrets }}
+      {{- end }}
+      containers:
+        - name: {{ .Chart.Name }}
+          image: {{ .Values.application.image }}:{{ .Values.application.imageTag }}
+          imagePullPolicy: {{ .Values.imagePullPolicy | default "Always"}}
+          env:
+            - name: REDIS_HOST
+              valueFrom:
+                configMapKeyRef:
+                  key: REDIS_HOST
+                  name: {{ .Chart.Name }}
+            - name: REDIS_PORT
+              valueFrom:
+                secretKeyRef:
+                  key: REDIS_PORT
+                  name: {{ .Chart.Name }}
+            - name: REDIS_DB
+              valueFrom:
+                secretKeyRef:
+                  key: REDIS_DB
+                  name: {{ .Chart.Name }}
+            - name: ENVIRONMENT
+              value: {{ .Values.env | quote }}
+            - name: HOST
+              value: {{ .Values.application.appHost | quote }}
+            - name: PORT
+              value: {{ .Values.application.port | quote }}
+          resources:
+            {{- if eq .Values.env "prod" }}
+            {{- toYaml .Values.resources.prod | nindent 12 }}
+            {{- else if eq .Values.env "staging" }}
+            {{- toYaml .Values.resources.staging | nindent 12 }}
+            {{- else }}
+            {{- toYaml .Values.resources.dev | nindent 12 }}
+            {{- end }}
+          ports:
+            - containerPort: {{ .Values.application.port }}
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              port: {{ .Values.application.port }}
+              path: {{ .Values.livenessProbe.path }}
+            initialDelaySeconds: {{ .Values.livenessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.livenessProbe.periodSeconds }}
+            failureThreshold: {{ .Values.livenessProbe.failureThreshold }}
+          readinessProbe:
+            httpGet:
+              port: {{ .Values.application.port }}
+              path: {{ .Values.readinessProbe.path }}
+            initialDelaySeconds: {{ .Values.readinessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.readinessProbe.periodSeconds }}
+            failureThreshold: {{ .Values.readinessProbe.failureThreshold }}
+      restartPolicy: Always

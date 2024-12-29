@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: demo-deployment
+spec:
+  replicas: 3  # Ensure 3 replicas for high availability
+  selector:
+    matchLabels:
+      app: demo-app
+  template:
+    metadata:
+      labels:
+        app: demo-app
+    spec:
+      containers:
+        - name: demo-container
+          image: ersanjeev/testapp02122024:latest # Replace with  Docker image
+          ports:
+            - containerPort: 8000  # application will run on port 8000 inside container 
+          envFrom:
+            - configMapRef:
+                name: application-env-variable  # Reference the ConfigMap for non-sensitive envs
+          resources:
+            requests:
+              memory: "100Mi"
+              cpu: "100m"
+            limits:
+              memory: "200Mi"
+              cpu: "200m"  # You can tweak these based on your app's requirements
+      imagePullSecrets:
+        - name: regcred        
+

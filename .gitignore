@@ -1,1 +1,5 @@
 .vscode/*
+*.tfstate*
+.terraform/
+.terragrunt-cache/
+venv/
